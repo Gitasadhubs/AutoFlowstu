@@ -84,24 +84,43 @@ export const activitiesRelations = relations(activities, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
+export const insertUserSchema = z.object({
+  username: z.string(),
+  email: z.string(),
+  githubId: z.string().optional(),
+  avatar: z.string().optional(),
+  accessToken: z.string().optional(),
 });
 
-export const insertProjectSchema = createInsertSchema(projects).omit({
-  id: true,
-  createdAt: true,
+export const insertProjectSchema = z.object({
+  userId: z.number(),
+  name: z.string(),
+  description: z.string().optional(),
+  repositoryUrl: z.string(),
+  repositoryName: z.string(),
+  branch: z.string().optional(),
+  framework: z.string(),
+  deploymentUrl: z.string().optional(),
+  status: z.string().optional(),
+  lastDeploymentAt: z.date().optional(),
 });
 
-export const insertDeploymentSchema = createInsertSchema(deployments).omit({
-  id: true,
-  startedAt: true,
+export const insertDeploymentSchema = z.object({
+  projectId: z.number(),
+  status: z.string().optional(),
+  commitHash: z.string().optional(),
+  commitMessage: z.string().optional(),
+  buildLogs: z.string().optional(),
+  deploymentUrl: z.string().optional(),
+  completedAt: z.date().optional(),
 });
 
-export const insertActivitySchema = createInsertSchema(activities).omit({
-  id: true,
-  createdAt: true,
+export const insertActivitySchema = z.object({
+  userId: z.number(),
+  projectId: z.number().optional(),
+  type: z.string(),
+  description: z.string(),
+  metadata: z.any().optional(),
 });
 
 // Types
