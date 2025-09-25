@@ -32,7 +32,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_URL: ${{ secrets.RAILWAY_BACKEND_URL }}
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          VITE_GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
           NODE_ENV: production
         run: npm run build
       
@@ -70,9 +70,15 @@ jobs:
       - name: Deploy to Railway
         working-directory: backend
         run: |
-          railway up --service autoflow-backend --environment production
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --environment production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
 
   notify-success:
     name: Deployment Success Notification
