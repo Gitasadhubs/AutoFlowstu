@@ -84,7 +84,7 @@ export const activitiesRelations = relations(activities, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
+export const insertUserSchema = createInsertSchema(users).omit(['id', 'createdAt']);
 
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 
