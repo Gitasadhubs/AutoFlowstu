@@ -4,7 +4,7 @@ import passport from "passport";
 import { Octokit } from "@octokit/rest";
 import { storage } from "./storage";
 import { requireAuth, getCurrentUser } from "./auth";
-import { insertUserSchema, insertProjectSchema, insertDeploymentSchema, type Project } from "#shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDeploymentSchema, type Project } from "../shared/schema";
 import { z } from "zod";
 
 // GitHub Actions workflow creation
@@ -309,9 +309,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update deployment status to failed
         await storage.updateDeployment(deployment.id, {
           status: "failed",
-          buildLogs: `Failed to trigger deployment: ${workflowError.message}`
+          buildLogs: `Failed to trigger deployment: ${workflowError instanceof Error ? workflowError.message : String(workflowError)}`
         });
-        
+
         await storage.updateProject(projectId, {
           status: "failed"
         });
