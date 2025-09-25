@@ -3,7 +3,7 @@ import passport from "passport";
 import { Octokit } from "@octokit/rest";
 import { storage } from "./storage";
 import { requireAuth, getCurrentUser } from "./auth";
-import { insertProjectSchema } from "../shared/schema";
+import { insertProjectSchema } from "#shared/schema";
 import { z } from "zod";
 // GitHub Actions workflow creation
 async function createGitHubActionsWorkflow(accessToken, project) {
