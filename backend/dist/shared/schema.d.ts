@@ -638,10 +638,22 @@ export declare const activitiesRelations: import("drizzle-orm").Relations<"activ
     user: import("drizzle-orm").One<"users", true>;
     project: import("drizzle-orm").One<"projects", false>;
 }>;
-export declare const insertUserSchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
-export declare const insertProjectSchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
-export declare const insertDeploymentSchema: z.ZodObject<Omit<{}, "id" | "startedAt">, "strip", z.ZodTypeAny, {}, {}>;
-export declare const insertActivitySchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertUserSchema: import("zod/v4").ZodObject<{}, {
+    out: {};
+    in: {};
+}>;
+export declare const insertProjectSchema: import("zod/v4").ZodObject<{}, {
+    out: {};
+    in: {};
+}>;
+export declare const insertDeploymentSchema: import("zod/v4").ZodObject<{}, {
+    out: {};
+    in: {};
+}>;
+export declare const insertActivitySchema: import("zod/v4").ZodObject<{}, {
+    out: {};
+    in: {};
+}>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Project = typeof projects.$inferSelect;
