@@ -32,11 +32,12 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_URL: ${{ secrets.RAILWAY_BACKEND_URL }}
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
           NODE_ENV: production
         run: npm run build
       
       - name: Deploy to Vercel
+        id: deploy-frontend
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -77,8 +78,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
-          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
 
   notify-success:
     name: Deployment Success Notification
@@ -90,5 +91,5 @@ jobs:
       - name: Success Notification
         run: |
           echo "✅ AutoFlow deployed successfully!"
-          echo "Frontend: https://${{ secrets.VERCEL_DOMAIN }}"
+          echo "Frontend: ${{ steps.deploy-frontend.outputs.deployment-url }}"
           echo "Backend: ${{ secrets.RAILWAY_BACKEND_URL }}"
