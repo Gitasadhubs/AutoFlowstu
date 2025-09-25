@@ -23,7 +23,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: ./autoflow-frontend/package-lock.json
       
       - name: Install Frontend Dependencies
         working-directory: ./autoflow-frontend
@@ -59,7 +58,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: ./autoflow-backend/package-lock.json
       
       - name: Install Backend Dependencies
         working-directory: ./autoflow-backend
