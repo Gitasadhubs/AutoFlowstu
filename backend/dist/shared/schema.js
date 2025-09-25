@@ -1,6 +1,5 @@
 import { pgTable, text, serial, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
 import { relations } from "drizzle-orm";
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
@@ -76,17 +75,6 @@ export const activitiesRelations = relations(activities, ({ one }) => ({
 }));
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users);
-export const insertProjectSchema = z.object({
-    userId: z.number(),
-    name: z.string(),
-    description: z.string().optional(),
-    repositoryUrl: z.string(),
-    repositoryName: z.string(),
-    branch: z.string().optional(),
-    framework: z.string(),
-    deploymentUrl: z.string().optional(),
-    status: z.string().optional(),
-    lastDeploymentAt: z.date().optional(),
-});
+export const insertProjectSchema = createInsertSchema(projects);
 export const insertDeploymentSchema = createInsertSchema(deployments);
 export const insertActivitySchema = createInsertSchema(activities);

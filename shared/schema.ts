@@ -85,18 +85,7 @@ export const activitiesRelations = relations(activities, ({ one }) => ({
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users);
-export const insertProjectSchema = z.object({
-  userId: z.number(),
-  name: z.string(),
-  description: z.string().optional(),
-  repositoryUrl: z.string(),
-  repositoryName: z.string(),
-  branch: z.string().optional(),
-  framework: z.string(),
-  deploymentUrl: z.string().optional(),
-  status: z.string().optional(),
-  lastDeploymentAt: z.date().optional(),
-});
+export const insertProjectSchema = createInsertSchema(projects);
 export const insertDeploymentSchema = createInsertSchema(deployments);
 export const insertActivitySchema = createInsertSchema(activities);
 
@@ -104,7 +93,7 @@ export const insertActivitySchema = createInsertSchema(activities);
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
-export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type InsertProject = typeof projects.$inferInsert;
 export type Deployment = typeof deployments.$inferSelect;
 export type InsertDeployment = typeof deployments.$inferInsert;
 export type Activity = typeof activities.$inferSelect;
