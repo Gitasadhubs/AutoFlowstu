@@ -1,9 +1,9 @@
-import { 
-  users, 
-  projects, 
-  deployments, 
+import {
+  users,
+  projects,
+  deployments,
   activities,
-  type User, 
+  type User,
   type InsertUser,
   type Project,
   type InsertProject,
@@ -11,7 +11,7 @@ import {
   type InsertDeployment,
   type Activity,
   type InsertActivity
-} from "../shared/schema";
+} from "#shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 

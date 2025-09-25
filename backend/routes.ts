@@ -4,7 +4,7 @@ import passport from "passport";
 import { Octokit } from "@octokit/rest";
 import { storage } from "./storage";
 import { requireAuth, getCurrentUser } from "./auth";
-import { insertUserSchema, insertProjectSchema, insertDeploymentSchema, type Project } from "../shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDeploymentSchema, type Project, type InsertProject } from "#shared/schema";
 import { z } from "zod";
 
 // GitHub Actions workflow creation
@@ -177,7 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "GitHub access token not found" });
       }
 
-      const projectData = insertProjectSchema.parse({
+      const projectData: InsertProject = insertProjectSchema.parse({
         ...req.body,
         userId: user.id
       });

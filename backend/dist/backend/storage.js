@@ -1,4 +1,4 @@
-import { users, projects, deployments, activities } from "../shared/schema";
+import { users, projects, deployments, activities } from "#shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 export class DatabaseStorage {
