@@ -70,16 +70,9 @@ jobs:
       
       - name: Deploy to Railway
         working-directory: backend
-        run: |
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
-          railway up --environment production
+        run: railway deploy --environment production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
-          GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
 
   notify-success:
     name: Deployment Success Notification
