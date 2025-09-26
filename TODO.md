@@ -1,9 +1,10 @@
-# Backend Build Fix Tasks
-
-- [x] Update zod version in backend/package.json to ^3.23.18 for drizzle-zod compatibility
-- [x] Fix Vite imports in backend/vite.ts: remove createLogger, use console.error
-- [x] Run npm install in backend directory
-- [x] Run npm run build in backend directory to verify success
-- [x] Fix Zod omit syntax in schema.ts: use object syntax instead of array
-- [x] Add missing @radix-ui/react-tooltip to frontend/package.json
-- [x] Switch to html2canvas-pro for PDF generation: install html2canvas-pro and jspdf, create pdfGenerator.ts utility
+- [x] Upgrade Node.js to v20+
+- [x] Update engines in backend/package.json to >=20.0.0
+- [x] Update engines in frontend/package.json to >=20.0.0
+- [x] Update dependencies in backend with npm update
+- [x] Update dependencies in frontend with npm update
+- [x] Fix vulnerabilities in backend with npm audit fix (attempted, remaining moderate vulnerabilities)
+- [x] Fix vulnerabilities in frontend with npm audit fix (attempted, remaining vulnerabilities)
+- [x] Run npm ci in backend to verify no warnings
+- [x] Run npm ci in frontend to verify no warnings
+- [x] Test the project stability (backend and frontend build successfully)
