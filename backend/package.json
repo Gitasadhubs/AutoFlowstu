@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc && cp -r shared dist/",
+    "build": "tsc",
     "dev": "tsx watch index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -24,10 +24,11 @@
     "helmet": "^8.0.0",
     "nanoid": "^5.0.9",
     "passport": "^0.7.0",
+    "pg": "^8.11.0",
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
     "ws": "^8.18.0",
-    "zod": "^3.23.18",
+    "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
