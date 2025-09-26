@@ -31,8 +31,8 @@ jobs:
       - name: Build Frontend
         working-directory: ./frontend
         env:
-          VITE_API_URL: ${{ secrets.RAILWAY_BACKEND_URL }}
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          VITE_API_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
           NODE_ENV: production
         run: npm run build
       
@@ -49,7 +49,8 @@ jobs:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
     env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # Use project-level token if you have one
     
     steps:
       - name: Checkout Code
@@ -71,11 +72,12 @@ jobs:
 
       - name: Deploy Backend to Railway via CLI
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # Replace with project token if needed
         run: |
           npm install -g @railway/cli
           cd ./backend
-          railway up --service=autoflow-backend --environment=production
+          railway up --project $RAILWAY_PROJECT_ID --token $RAILWAY_TOKEN --service=autoflow-backend --environment=production
 
   notify-success:
     name: Deployment Success Notification
@@ -88,4 +90,4 @@ jobs:
         run: |
           echo "✅ AutoFlow deployed successfully!"
           echo "Frontend: https://${{ secrets.VERCEL_PROJECT_ID }}.vercel.app"
-          echo "Backend: ${{ secrets.RAILWAY_BACKEND_URL }}"
+          echo "Backend: ${{ secrets.RAILWAY_DATABASE_URL }}"
