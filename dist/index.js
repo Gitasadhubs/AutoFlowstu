@@ -1,9 +1,8 @@
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined") return require.apply(this, arguments);
-  throw Error('Dynamic require of "' + x + '" is not supported');
-});
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 
 // server/index.ts
 import express2 from "express";
@@ -107,92 +106,136 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import ws from "ws";
 
-// shared/schema.js
+// backend/src/schema.ts
 var schema_exports = {};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertActivitySchema = exports.insertDeploymentSchema = exports.insertProjectSchema = exports.insertUserSchema = exports.activitiesRelations = exports.deploymentsRelations = exports.projectsRelations = exports.usersRelations = exports.activities = exports.deployments = exports.projects = exports.users = void 0;
-var pg_core_1 = __require("drizzle-orm/pg-core");
-var drizzle_zod_1 = __require("drizzle-zod");
-var drizzle_orm_1 = __require("drizzle-orm");
-exports.users = (0, pg_core_1.pgTable)("users", {
-  id: (0, pg_core_1.serial)("id").primaryKey(),
-  username: (0, pg_core_1.text)("username").notNull().unique(),
-  email: (0, pg_core_1.text)("email").notNull().unique(),
-  githubId: (0, pg_core_1.text)("github_id").unique(),
-  avatar: (0, pg_core_1.text)("avatar"),
-  accessToken: (0, pg_core_1.text)("access_token"),
-  createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow().notNull()
+__export(schema_exports, {
+  activities: () => activities2,
+  activitiesRelations: () => activitiesRelations2,
+  deployments: () => deployments2,
+  deploymentsRelations: () => deploymentsRelations2,
+  insertActivitySchema: () => insertActivitySchema2,
+  insertDeploymentSchema: () => insertDeploymentSchema2,
+  insertProjectSchema: () => insertProjectSchema2,
+  insertUserSchema: () => insertUserSchema2,
+  projects: () => projects2,
+  projectsRelations: () => projectsRelations2,
+  users: () => users2,
+  usersRelations: () => usersRelations2
 });
-exports.projects = (0, pg_core_1.pgTable)("projects", {
-  id: (0, pg_core_1.serial)("id").primaryKey(),
-  userId: (0, pg_core_1.integer)("user_id").notNull(),
-  name: (0, pg_core_1.text)("name").notNull(),
-  description: (0, pg_core_1.text)("description"),
-  repositoryUrl: (0, pg_core_1.text)("repository_url").notNull(),
-  repositoryName: (0, pg_core_1.text)("repository_name").notNull(),
-  branch: (0, pg_core_1.text)("branch").default("main").notNull(),
-  framework: (0, pg_core_1.text)("framework").notNull(),
+import { pgTable as pgTable2, text as text2, serial as serial2, integer as integer2, timestamp as timestamp2, jsonb as jsonb2 } from "drizzle-orm/pg-core";
+import { z } from "zod";
+import { relations as relations2 } from "drizzle-orm";
+var users2 = pgTable2("users", {
+  id: serial2("id").primaryKey(),
+  username: text2("username").notNull().unique(),
+  email: text2("email").notNull().unique(),
+  githubId: text2("github_id").unique(),
+  avatar: text2("avatar"),
+  accessToken: text2("access_token"),
+  createdAt: timestamp2("created_at").defaultNow().notNull()
+});
+var projects2 = pgTable2("projects", {
+  id: serial2("id").primaryKey(),
+  userId: integer2("user_id").notNull(),
+  name: text2("name").notNull(),
+  description: text2("description"),
+  repositoryUrl: text2("repository_url").notNull(),
+  repositoryName: text2("repository_name").notNull(),
+  branch: text2("branch").default("main").notNull(),
+  framework: text2("framework").notNull(),
   // react, node, python, etc.
-  deploymentUrl: (0, pg_core_1.text)("deployment_url"),
-  status: (0, pg_core_1.text)("status").default("pending").notNull(),
+  deploymentUrl: text2("deployment_url"),
+  status: text2("status").default("pending").notNull(),
   // pending, building, deployed, failed
-  lastDeploymentAt: (0, pg_core_1.timestamp)("last_deployment_at"),
-  createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow().notNull()
+  lastDeploymentAt: timestamp2("last_deployment_at"),
+  createdAt: timestamp2("created_at").defaultNow().notNull()
 });
-exports.deployments = (0, pg_core_1.pgTable)("deployments", {
-  id: (0, pg_core_1.serial)("id").primaryKey(),
-  projectId: (0, pg_core_1.integer)("project_id").notNull(),
-  status: (0, pg_core_1.text)("status").default("pending").notNull(),
+var deployments2 = pgTable2("deployments", {
+  id: serial2("id").primaryKey(),
+  projectId: integer2("project_id").notNull(),
+  status: text2("status").default("pending").notNull(),
   // pending, building, success, failed
-  commitHash: (0, pg_core_1.text)("commit_hash"),
-  commitMessage: (0, pg_core_1.text)("commit_message"),
-  buildLogs: (0, pg_core_1.text)("build_logs"),
-  deploymentUrl: (0, pg_core_1.text)("deployment_url"),
-  startedAt: (0, pg_core_1.timestamp)("started_at").defaultNow().notNull(),
-  completedAt: (0, pg_core_1.timestamp)("completed_at")
+  commitHash: text2("commit_hash"),
+  commitMessage: text2("commit_message"),
+  buildLogs: text2("build_logs"),
+  deploymentUrl: text2("deployment_url"),
+  startedAt: timestamp2("started_at").defaultNow().notNull(),
+  completedAt: timestamp2("completed_at")
 });
-exports.activities = (0, pg_core_1.pgTable)("activities", {
-  id: (0, pg_core_1.serial)("id").primaryKey(),
-  userId: (0, pg_core_1.integer)("user_id").notNull(),
-  projectId: (0, pg_core_1.integer)("project_id"),
-  type: (0, pg_core_1.text)("type").notNull(),
+var activities2 = pgTable2("activities", {
+  id: serial2("id").primaryKey(),
+  userId: integer2("user_id").notNull(),
+  projectId: integer2("project_id"),
+  type: text2("type").notNull(),
   // deployment, build, error, etc.
-  description: (0, pg_core_1.text)("description").notNull(),
-  metadata: (0, pg_core_1.jsonb)("metadata"),
-  createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow().notNull()
+  description: text2("description").notNull(),
+  metadata: jsonb2("metadata"),
+  createdAt: timestamp2("created_at").defaultNow().notNull()
 });
-exports.usersRelations = (0, drizzle_orm_1.relations)(exports.users, ({ many }) => ({
-  projects: many(exports.projects),
-  activities: many(exports.activities)
+var usersRelations2 = relations2(users2, ({ many }) => ({
+  projects: many(projects2),
+  activities: many(activities2)
 }));
-exports.projectsRelations = (0, drizzle_orm_1.relations)(exports.projects, ({ one, many }) => ({
-  user: one(exports.users, {
-    fields: [exports.projects.userId],
-    references: [exports.users.id]
+var projectsRelations2 = relations2(projects2, ({ one, many }) => ({
+  user: one(users2, {
+    fields: [projects2.userId],
+    references: [users2.id]
   }),
-  deployments: many(exports.deployments),
-  activities: many(exports.activities)
+  deployments: many(deployments2),
+  activities: many(activities2)
 }));
-exports.deploymentsRelations = (0, drizzle_orm_1.relations)(exports.deployments, ({ one }) => ({
-  project: one(exports.projects, {
-    fields: [exports.deployments.projectId],
-    references: [exports.projects.id]
+var deploymentsRelations2 = relations2(deployments2, ({ one }) => ({
+  project: one(projects2, {
+    fields: [deployments2.projectId],
+    references: [projects2.id]
   })
 }));
-exports.activitiesRelations = (0, drizzle_orm_1.relations)(exports.activities, ({ one }) => ({
-  user: one(exports.users, {
-    fields: [exports.activities.userId],
-    references: [exports.users.id]
+var activitiesRelations2 = relations2(activities2, ({ one }) => ({
+  user: one(users2, {
+    fields: [activities2.userId],
+    references: [users2.id]
   }),
-  project: one(exports.projects, {
-    fields: [exports.activities.projectId],
-    references: [exports.projects.id]
+  project: one(projects2, {
+    fields: [activities2.projectId],
+    references: [projects2.id]
   })
 }));
-exports.insertUserSchema = (0, drizzle_zod_1.createInsertSchema)(exports.users);
-exports.insertProjectSchema = (0, drizzle_zod_1.createInsertSchema)(exports.projects);
-exports.insertDeploymentSchema = (0, drizzle_zod_1.createInsertSchema)(exports.deployments);
-exports.insertActivitySchema = (0, drizzle_zod_1.createInsertSchema)(exports.activities);
+var insertUserSchema2 = z.object({
+  username: z.string(),
+  email: z.string(),
+  githubId: z.string().optional(),
+  avatar: z.string().optional(),
+  accessToken: z.string().optional()
+});
+var insertProjectSchema2 = z.object({
+  userId: z.number(),
+  name: z.string(),
+  description: z.string().optional(),
+  repositoryUrl: z.string(),
+  repositoryName: z.string(),
+  branch: z.string().optional(),
+  framework: z.string(),
+  deploymentUrl: z.string().optional(),
+  status: z.string().optional(),
+  lastDeploymentAt: z.date().optional()
+});
+var insertDeploymentSchema2 = z.object({
+  projectId: z.number(),
+  status: z.string().optional(),
+  commitHash: z.string().optional(),
+  commitMessage: z.string().optional(),
+  buildLogs: z.string().optional(),
+  deploymentUrl: z.string().optional(),
+  startedAt: z.date().optional(),
+  completedAt: z.date().optional()
+});
+var insertActivitySchema2 = z.object({
+  userId: z.number().optional(),
+  projectId: z.number().optional(),
+  type: z.string(),
+  description: z.string(),
+  metadata: z.record(z.any()).optional()
+});
 
 // server/db.ts
 neonConfig.webSocketConstructor = ws;
@@ -328,7 +371,7 @@ var getCurrentUser = (req) => {
 };
 
 // server/routes.ts
-import { z } from "zod";
+import { z as z2 } from "zod";
 async function createGitHubActionsWorkflow(accessToken, project) {
   const octokit = new Octokit({ auth: accessToken });
   const [owner, repo] = project.repositoryName.split("/");
@@ -464,8 +507,8 @@ async function registerRoutes(app2) {
       if (!user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
-      const projects2 = await storage.getProjectsByUserId(user.id);
-      res.json(projects2);
+      const projects3 = await storage.getProjectsByUserId(user.id);
+      res.json(projects3);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch projects" });
     }
@@ -476,7 +519,7 @@ async function registerRoutes(app2) {
       if (!user || !user.accessToken) {
         return res.status(401).json({ message: "GitHub access token not found" });
       }
-      const projectData = insertProjectSchema.parse({
+      const projectData = insertProjectSchema2.parse({
         ...req.body,
         userId: user.id
       });
@@ -494,7 +537,7 @@ async function registerRoutes(app2) {
       });
       res.status(201).json(project);
     } catch (error) {
-      if (error instanceof z.ZodError) {
+      if (error instanceof z2.ZodError) {
         return res.status(400).json({ message: "Invalid project data", errors: error.errors });
       }
       console.error("Project creation error:", error);
@@ -541,8 +584,8 @@ async function registerRoutes(app2) {
   app2.get("/api/projects/:id/deployments", async (req, res) => {
     try {
       const projectId = parseInt(req.params.id);
-      const deployments2 = await storage.getDeploymentsByProjectId(projectId);
-      res.json(deployments2);
+      const deployments3 = await storage.getDeploymentsByProjectId(projectId);
+      res.json(deployments3);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch deployments" });
     }
@@ -604,8 +647,8 @@ async function registerRoutes(app2) {
         return res.status(401).json({ message: "Not authenticated" });
       }
       const limit = parseInt(req.query.limit) || 10;
-      const activities2 = await storage.getActivitiesByUserId(user.id, limit);
-      res.json(activities2);
+      const activities3 = await storage.getActivitiesByUserId(user.id, limit);
+      res.json(activities3);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch activities" });
     }
@@ -646,12 +689,12 @@ async function registerRoutes(app2) {
       if (!user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
-      const projects2 = await storage.getProjectsByUserId(user.id);
+      const projects3 = await storage.getProjectsByUserId(user.id);
       const stats = {
-        totalProjects: projects2.length,
-        successfulDeployments: projects2.filter((p) => p.status === "deployed").length,
+        totalProjects: projects3.length,
+        successfulDeployments: projects3.filter((p) => p.status === "deployed").length,
         avgBuildTime: "2.3min",
-        successRate: projects2.length > 0 ? Math.round(projects2.filter((p) => p.status === "deployed").length / projects2.length * 100) + "%" : "0%"
+        successRate: projects3.length > 0 ? Math.round(projects3.filter((p) => p.status === "deployed").length / projects3.length * 100) + "%" : "0%"
       };
       res.json(stats);
     } catch (error) {
