@@ -4,7 +4,7 @@ import passport from "passport";
 import { Octokit } from "@octokit/rest";
 import { storage } from "./storage";
 import { requireAuth, getCurrentUser } from "./auth";
-import { insertUserSchema, insertProjectSchema, insertDeploymentSchema, type Project, type InsertProject } from "#shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDeploymentSchema, type Project, type InsertProject } from "./src/schema";
 import { z } from "zod";
 
 // GitHub Actions workflow creation
