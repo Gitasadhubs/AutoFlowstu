@@ -71,7 +71,7 @@ jobs:
 
       - name: Deploy Backend to Railway via CLI
         run: |
-          npm install -g railway
+          npm install -g @railway/cli
           railway login --token $RAILWAY_TOKEN
           cd ./backend
           railway up --service=autoflow-backend --environment=production
