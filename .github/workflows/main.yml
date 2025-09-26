@@ -49,7 +49,7 @@ jobs:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
     env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}        # or project-level token
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
       RAILWAY_PROJECT: ${{ secrets.RAILWAY_PROJECT_ID }}
 
     steps:
