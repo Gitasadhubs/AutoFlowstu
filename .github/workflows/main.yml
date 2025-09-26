@@ -51,6 +51,7 @@ jobs:
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
       RAILWAY_PROJECT: ${{ secrets.RAILWAY_PROJECT_ID }}
+      DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
 
     steps:
       - name: Checkout Code
@@ -70,11 +71,15 @@ jobs:
         working-directory: ./backend
         run: npm run build
 
+      - name: Run Drizzle Migrations
+        working-directory: ./backend
+        run: npx drizzle-kit migrate
+
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
           cd ./backend
-          railway up --service=autoflow-backend --environment=production
+          railway up --service=backend --environment=production
 
   notify-success:
     name: Deployment Success Notification
