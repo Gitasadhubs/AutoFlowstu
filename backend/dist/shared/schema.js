@@ -1,92 +1,115 @@
-import { pgTable, text, serial, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
-import { relations } from "drizzle-orm";
-export const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    username: text("username").notNull().unique(),
-    email: text("email").notNull().unique(),
-    githubId: text("github_id").unique(),
-    avatar: text("avatar"),
-    accessToken: text("access_token"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.insertActivitySchema = exports.insertDeploymentSchema = exports.insertProjectSchema = exports.insertUserSchema = exports.activitiesRelations = exports.deploymentsRelations = exports.projectsRelations = exports.usersRelations = exports.activities = exports.deployments = exports.projects = exports.users = void 0;
+const pg_core_1 = require("drizzle-orm/pg-core");
+const zod_1 = require("zod");
+const drizzle_orm_1 = require("drizzle-orm");
+exports.users = (0, pg_core_1.pgTable)("users", {
+    id: (0, pg_core_1.serial)("id").primaryKey(),
+    username: (0, pg_core_1.text)("username").notNull().unique(),
+    email: (0, pg_core_1.text)("email").notNull().unique(),
+    githubId: (0, pg_core_1.text)("github_id").unique(),
+    avatar: (0, pg_core_1.text)("avatar"),
+    accessToken: (0, pg_core_1.text)("access_token"),
+    createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow().notNull(),
 });
-export const projects = pgTable("projects", {
-    id: serial("id").primaryKey(),
-    userId: integer("user_id").notNull(),
-    name: text("name").notNull(),
-    description: text("description"),
-    repositoryUrl: text("repository_url").notNull(),
-    repositoryName: text("repository_name").notNull(),
-    branch: text("branch").default("main").notNull(),
-    framework: text("framework").notNull(), // react, node, python, etc.
-    deploymentUrl: text("deployment_url"),
-    status: text("status").default("pending").notNull(), // pending, building, deployed, failed
-    lastDeploymentAt: timestamp("last_deployment_at"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+exports.projects = (0, pg_core_1.pgTable)("projects", {
+    id: (0, pg_core_1.serial)("id").primaryKey(),
+    userId: (0, pg_core_1.integer)("user_id").notNull(),
+    name: (0, pg_core_1.text)("name").notNull(),
+    description: (0, pg_core_1.text)("description"),
+    repositoryUrl: (0, pg_core_1.text)("repository_url").notNull(),
+    repositoryName: (0, pg_core_1.text)("repository_name").notNull(),
+    branch: (0, pg_core_1.text)("branch").default("main").notNull(),
+    framework: (0, pg_core_1.text)("framework").notNull(), // react, node, python, etc.
+    deploymentUrl: (0, pg_core_1.text)("deployment_url"),
+    status: (0, pg_core_1.text)("status").default("pending").notNull(), // pending, building, deployed, failed
+    lastDeploymentAt: (0, pg_core_1.timestamp)("last_deployment_at"),
+    createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow().notNull(),
 });
-export const deployments = pgTable("deployments", {
-    id: serial("id").primaryKey(),
-    projectId: integer("project_id").notNull(),
-    status: text("status").default("pending").notNull(), // pending, building, success, failed
-    commitHash: text("commit_hash"),
-    commitMessage: text("commit_message"),
-    buildLogs: text("build_logs"),
-    deploymentUrl: text("deployment_url"),
-    startedAt: timestamp("started_at").defaultNow().notNull(),
-    completedAt: timestamp("completed_at"),
+exports.deployments = (0, pg_core_1.pgTable)("deployments", {
+    id: (0, pg_core_1.serial)("id").primaryKey(),
+    projectId: (0, pg_core_1.integer)("project_id").notNull(),
+    status: (0, pg_core_1.text)("status").default("pending").notNull(), // pending, building, success, failed
+    commitHash: (0, pg_core_1.text)("commit_hash"),
+    commitMessage: (0, pg_core_1.text)("commit_message"),
+    buildLogs: (0, pg_core_1.text)("build_logs"),
+    deploymentUrl: (0, pg_core_1.text)("deployment_url"),
+    startedAt: (0, pg_core_1.timestamp)("started_at").defaultNow().notNull(),
+    completedAt: (0, pg_core_1.timestamp)("completed_at"),
 });
-export const activities = pgTable("activities", {
-    id: serial("id").primaryKey(),
-    userId: integer("user_id").notNull(),
-    projectId: integer("project_id"),
-    type: text("type").notNull(), // deployment, build, error, etc.
-    description: text("description").notNull(),
-    metadata: jsonb("metadata"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+exports.activities = (0, pg_core_1.pgTable)("activities", {
+    id: (0, pg_core_1.serial)("id").primaryKey(),
+    userId: (0, pg_core_1.integer)("user_id").notNull(),
+    projectId: (0, pg_core_1.integer)("project_id"),
+    type: (0, pg_core_1.text)("type").notNull(), // deployment, build, error, etc.
+    description: (0, pg_core_1.text)("description").notNull(),
+    metadata: (0, pg_core_1.jsonb)("metadata"),
+    createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow().notNull(),
 });
 // Relations
-export const usersRelations = relations(users, ({ many }) => ({
-    projects: many(projects),
-    activities: many(activities),
+exports.usersRelations = (0, drizzle_orm_1.relations)(exports.users, ({ many }) => ({
+    projects: many(exports.projects),
+    activities: many(exports.activities),
 }));
-export const projectsRelations = relations(projects, ({ one, many }) => ({
-    user: one(users, {
-        fields: [projects.userId],
-        references: [users.id],
+exports.projectsRelations = (0, drizzle_orm_1.relations)(exports.projects, ({ one, many }) => ({
+    user: one(exports.users, {
+        fields: [exports.projects.userId],
+        references: [exports.users.id],
     }),
-    deployments: many(deployments),
-    activities: many(activities),
+    deployments: many(exports.deployments),
+    activities: many(exports.activities),
 }));
-export const deploymentsRelations = relations(deployments, ({ one }) => ({
-    project: one(projects, {
-        fields: [deployments.projectId],
-        references: [projects.id],
+exports.deploymentsRelations = (0, drizzle_orm_1.relations)(exports.deployments, ({ one }) => ({
+    project: one(exports.projects, {
+        fields: [exports.deployments.projectId],
+        references: [exports.projects.id],
     }),
 }));
-export const activitiesRelations = relations(activities, ({ one }) => ({
-    user: one(users, {
-        fields: [activities.userId],
-        references: [users.id],
+exports.activitiesRelations = (0, drizzle_orm_1.relations)(exports.activities, ({ one }) => ({
+    user: one(exports.users, {
+        fields: [exports.activities.userId],
+        references: [exports.users.id],
     }),
-    project: one(projects, {
-        fields: [activities.projectId],
-        references: [projects.id],
+    project: one(exports.projects, {
+        fields: [exports.activities.projectId],
+        references: [exports.projects.id],
     }),
 }));
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users);
-export const insertProjectSchema = z.object({
-    userId: z.number(),
-    name: z.string(),
-    description: z.string().optional(),
-    repositoryUrl: z.string(),
-    repositoryName: z.string(),
-    branch: z.string().optional(),
-    framework: z.string(),
-    deploymentUrl: z.string().optional(),
-    status: z.string().optional(),
-    lastDeploymentAt: z.date().optional(),
+exports.insertUserSchema = zod_1.z.object({
+    username: zod_1.z.string(),
+    email: zod_1.z.string(),
+    githubId: zod_1.z.string().optional(),
+    avatar: zod_1.z.string().optional(),
+    accessToken: zod_1.z.string().optional(),
 });
-export const insertDeploymentSchema = createInsertSchema(deployments);
-export const insertActivitySchema = createInsertSchema(activities);
+exports.insertProjectSchema = zod_1.z.object({
+    userId: zod_1.z.number(),
+    name: zod_1.z.string(),
+    description: zod_1.z.string().optional(),
+    repositoryUrl: zod_1.z.string(),
+    repositoryName: zod_1.z.string(),
+    branch: zod_1.z.string().optional(),
+    framework: zod_1.z.string(),
+    deploymentUrl: zod_1.z.string().optional(),
+    status: zod_1.z.string().optional(),
+    lastDeploymentAt: zod_1.z.date().optional(),
+});
+exports.insertDeploymentSchema = zod_1.z.object({
+    projectId: zod_1.z.number(),
+    status: zod_1.z.string().optional(),
+    commitHash: zod_1.z.string().optional(),
+    commitMessage: zod_1.z.string().optional(),
+    buildLogs: zod_1.z.string().optional(),
+    deploymentUrl: zod_1.z.string().optional(),
+    startedAt: zod_1.z.date().optional(),
+    completedAt: zod_1.z.date().optional(),
+});
+exports.insertActivitySchema = zod_1.z.object({
+    userId: zod_1.z.number().optional(),
+    projectId: zod_1.z.number().optional(),
+    type: zod_1.z.string(),
+    description: zod_1.z.string(),
+    metadata: zod_1.z.record(zod_1.z.any()).optional(),
+});

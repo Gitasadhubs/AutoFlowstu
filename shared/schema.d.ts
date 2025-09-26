@@ -638,116 +638,15 @@ export declare const activitiesRelations: import("drizzle-orm").Relations<"activ
     user: import("drizzle-orm").One<"users", true>;
     project: import("drizzle-orm").One<"projects", false>;
 }>;
-export declare const insertUserSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    username: z.ZodString;
-    email: z.ZodString;
-    githubId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    avatar: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    accessToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    createdAt: z.ZodOptional<z.ZodDate>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    username: string;
-    email: string;
-    githubId?: string | null | undefined;
-    avatar?: string | null | undefined;
-    accessToken?: string | null | undefined;
-}, {
-    username: string;
-    email: string;
-    githubId?: string | null | undefined;
-    avatar?: string | null | undefined;
-    accessToken?: string | null | undefined;
-}>;
-export declare const insertProjectSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    userId: z.ZodNumber;
-    name: z.ZodString;
-    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    repositoryUrl: z.ZodString;
-    repositoryName: z.ZodString;
-    branch: z.ZodOptional<z.ZodString>;
-    framework: z.ZodString;
-    deploymentUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    status: z.ZodOptional<z.ZodString>;
-    lastDeploymentAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    createdAt: z.ZodOptional<z.ZodDate>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    name: string;
-    userId: number;
-    repositoryUrl: string;
-    repositoryName: string;
-    framework: string;
-    description?: string | null | undefined;
-    branch?: string | undefined;
-    deploymentUrl?: string | null | undefined;
-    status?: string | undefined;
-    lastDeploymentAt?: Date | null | undefined;
-}, {
-    name: string;
-    userId: number;
-    repositoryUrl: string;
-    repositoryName: string;
-    framework: string;
-    description?: string | null | undefined;
-    branch?: string | undefined;
-    deploymentUrl?: string | null | undefined;
-    status?: string | undefined;
-    lastDeploymentAt?: Date | null | undefined;
-}>;
-export declare const insertDeploymentSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    projectId: z.ZodNumber;
-    status: z.ZodOptional<z.ZodString>;
-    commitHash: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    commitMessage: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    buildLogs: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    deploymentUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    startedAt: z.ZodOptional<z.ZodDate>;
-    completedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "startedAt">, "strip", z.ZodTypeAny, {
-    projectId: number;
-    deploymentUrl?: string | null | undefined;
-    status?: string | undefined;
-    commitHash?: string | null | undefined;
-    commitMessage?: string | null | undefined;
-    buildLogs?: string | null | undefined;
-    completedAt?: Date | null | undefined;
-}, {
-    projectId: number;
-    deploymentUrl?: string | null | undefined;
-    status?: string | undefined;
-    commitHash?: string | null | undefined;
-    commitMessage?: string | null | undefined;
-    buildLogs?: string | null | undefined;
-    completedAt?: Date | null | undefined;
-}>;
-export declare const insertActivitySchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    userId: z.ZodNumber;
-    projectId: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    type: z.ZodString;
-    description: z.ZodString;
-    metadata: z.ZodOptional<z.ZodNullable<z.ZodType<import("drizzle-zod/utils").Json, z.ZodTypeDef, import("drizzle-zod/utils").Json>>>;
-    createdAt: z.ZodOptional<z.ZodDate>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    userId: number;
-    description: string;
-    type: string;
-    projectId?: number | null | undefined;
-    metadata?: import("drizzle-zod/utils").Json | undefined;
-}, {
-    userId: number;
-    description: string;
-    type: string;
-    projectId?: number | null | undefined;
-    metadata?: import("drizzle-zod/utils").Json | undefined;
-}>;
+export declare const insertUserSchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
+export declare const insertProjectSchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
+export declare const insertDeploymentSchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
+export declare const insertActivitySchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
 export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Deployment = typeof deployments.$inferSelect;
-export type InsertDeployment = z.infer<typeof insertDeploymentSchema>;
+export type InsertDeployment = typeof deployments.$inferInsert;
 export type Activity = typeof activities.$inferSelect;
-export type InsertActivity = z.infer<typeof insertActivitySchema>;
+export type InsertActivity = typeof activities.$inferInsert;

@@ -1,13 +1,19 @@
-import { createServer } from "http";
-import passport from "passport";
-import { Octokit } from "@octokit/rest";
-import { storage } from "./storage";
-import { requireAuth, getCurrentUser } from "./auth";
-import { insertProjectSchema } from "../shared/schema";
-import { z } from "zod";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.registerRoutes = registerRoutes;
+const http_1 = require("http");
+const passport_1 = __importDefault(require("passport"));
+const rest_1 = require("@octokit/rest");
+const storage_1 = require("./storage");
+const auth_1 = require("./auth");
+const schema_1 = require("#shared/schema");
+const zod_1 = require("zod");
 // GitHub Actions workflow creation
 async function createGitHubActionsWorkflow(accessToken, project) {
-    const octokit = new Octokit({ auth: accessToken });
+    const octokit = new rest_1.Octokit({ auth: accessToken });
     const [owner, repo] = project.repositoryName.split('/');
     const workflowContent = generateWorkflowYaml(project);
     try {
@@ -43,7 +49,7 @@ async function createGitHubActionsWorkflow(accessToken, project) {
 }
 // Trigger GitHub Actions workflow
 async function triggerGitHubActionsWorkflow(accessToken, project, deploymentId) {
-    const octokit = new Octokit({ auth: accessToken });
+    const octokit = new rest_1.Octokit({ auth: accessToken });
     const [owner, repo] = project.repositoryName.split('/');
     await octokit.rest.actions.createWorkflowDispatch({
         owner,
@@ -116,19 +122,19 @@ jobs:
           -H "Content-Type: application/json" \\
           -d '{"deployment_id": "\${{ github.event.inputs.deployment_id }}", "status": "failed", "logs": "Deployment failed. Check the logs for details."}'`;
 }
-export async function registerRoutes(app) {
+async function registerRoutes(app) {
     // Auth endpoints
     app.get("/api/auth/user", (req, res) => {
-        const user = getCurrentUser(req);
+        const user = (0, auth_1.getCurrentUser)(req);
         if (!user) {
             return res.status(401).json({ message: "Not authenticated" });
         }
         res.json(user);
     });
-    app.get("/api/auth/github", passport.authenticate("github", {
+    app.get("/api/auth/github", passport_1.default.authenticate("github", {
         scope: ["user:email", "repo", "workflow"]
     }));
-    app.get("/api/auth/github/callback", passport.authenticate("github", { failureRedirect: "/login" }), (req, res) => {
+    app.get("/api/auth/github/callback", passport_1.default.authenticate("github", { failureRedirect: "/login" }), (req, res) => {
         // Successful authentication, redirect to dashboard
         res.redirect("/");
     });
@@ -141,30 +147,30 @@ export async function registerRoutes(app) {
         });
     });
     // Project endpoints
-    app.get("/api/projects", requireAuth, async (req, res) => {
+    app.get("/api/projects", auth_1.requireAuth, async (req, res) => {
         try {
-            const user = getCurrentUser(req);
+            const user = (0, auth_1.getCurrentUser)(req);
             if (!user) {
                 return res.status(401).json({ message: "Not authenticated" });
             }
-            const projects = await storage.getProjectsByUserId(user.id);
+            const projects = await storage_1.storage.getProjectsByUserId(user.id);
             res.json(projects);
         }
         catch (error) {
             res.status(500).json({ message: "Failed to fetch projects" });
         }
     });
-    app.post("/api/projects", requireAuth, async (req, res) => {
+    app.post("/api/projects", auth_1.requireAuth, async (req, res) => {
         try {
-            const user = getCurrentUser(req);
+            const user = (0, auth_1.getCurrentUser)(req);
             if (!user || !user.accessToken) {
                 return res.status(401).json({ message: "GitHub access token not found" });
             }
-            const projectData = insertProjectSchema.parse({
+            const projectData = schema_1.insertProjectSchema.parse({
                 ...req.body,
                 userId: user.id
             });
-            const project = await storage.createProject(projectData);
+            const project = await storage_1.storage.createProject(projectData);
             // Create GitHub Actions workflow
             try {
                 await createGitHubActionsWorkflow(user.accessToken, project);
@@ -174,7 +180,7 @@ export async function registerRoutes(app) {
                 // Continue even if workflow creation fails
             }
             // Create initial activity
-            await storage.createActivity({
+            await storage_1.storage.createActivity({
                 userId: user.id,
                 projectId: project.id,
                 type: "project_created",
@@ -183,7 +189,7 @@ export async function registerRoutes(app) {
             res.status(201).json(project);
         }
         catch (error) {
-            if (error instanceof z.ZodError) {
+            if (error instanceof zod_1.z.ZodError) {
                 return res.status(400).json({ message: "Invalid project data", errors: error.errors });
             }
             console.error("Project creation error:", error);
@@ -193,7 +199,7 @@ export async function registerRoutes(app) {
     app.get("/api/projects/:id", async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const project = await storage.getProject(id);
+            const project = await storage_1.storage.getProject(id);
             if (!project) {
                 return res.status(404).json({ message: "Project not found" });
             }
@@ -207,7 +213,7 @@ export async function registerRoutes(app) {
         try {
             const id = parseInt(req.params.id);
             const updates = req.body;
-            const project = await storage.updateProject(id, updates);
+            const project = await storage_1.storage.updateProject(id, updates);
             if (!project) {
                 return res.status(404).json({ message: "Project not found" });
             }
@@ -220,7 +226,7 @@ export async function registerRoutes(app) {
     app.delete("/api/projects/:id", async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const deleted = await storage.deleteProject(id);
+            const deleted = await storage_1.storage.deleteProject(id);
             if (!deleted) {
                 return res.status(404).json({ message: "Project not found" });
             }
@@ -234,37 +240,37 @@ export async function registerRoutes(app) {
     app.get("/api/projects/:id/deployments", async (req, res) => {
         try {
             const projectId = parseInt(req.params.id);
-            const deployments = await storage.getDeploymentsByProjectId(projectId);
+            const deployments = await storage_1.storage.getDeploymentsByProjectId(projectId);
             res.json(deployments);
         }
         catch (error) {
             res.status(500).json({ message: "Failed to fetch deployments" });
         }
     });
-    app.post("/api/projects/:id/deploy", requireAuth, async (req, res) => {
+    app.post("/api/projects/:id/deploy", auth_1.requireAuth, async (req, res) => {
         try {
             const projectId = parseInt(req.params.id);
-            const user = getCurrentUser(req);
+            const user = (0, auth_1.getCurrentUser)(req);
             if (!user || !user.accessToken) {
                 return res.status(401).json({ message: "GitHub access token not found" });
             }
-            const project = await storage.getProject(projectId);
+            const project = await storage_1.storage.getProject(projectId);
             if (!project) {
                 return res.status(404).json({ message: "Project not found" });
             }
             // Create deployment record
-            const deployment = await storage.createDeployment({
+            const deployment = await storage_1.storage.createDeployment({
                 projectId,
                 status: "building",
                 commitHash: req.body.commitHash || "latest",
                 commitMessage: req.body.commitMessage || "Deploy to production"
             });
             // Update project status
-            await storage.updateProject(projectId, {
+            await storage_1.storage.updateProject(projectId, {
                 status: "building"
             });
             // Create activity
-            await storage.createActivity({
+            await storage_1.storage.createActivity({
                 userId: user.id,
                 projectId,
                 type: "deployment_started",
@@ -277,14 +283,14 @@ export async function registerRoutes(app) {
             catch (workflowError) {
                 console.error("Failed to trigger GitHub Actions workflow:", workflowError);
                 // Update deployment status to failed
-                await storage.updateDeployment(deployment.id, {
+                await storage_1.storage.updateDeployment(deployment.id, {
                     status: "failed",
                     buildLogs: `Failed to trigger deployment: ${workflowError.message}`
                 });
-                await storage.updateProject(projectId, {
+                await storage_1.storage.updateProject(projectId, {
                     status: "failed"
                 });
-                await storage.createActivity({
+                await storage_1.storage.createActivity({
                     userId: user.id,
                     projectId,
                     type: "deployment_failed",
@@ -299,14 +305,14 @@ export async function registerRoutes(app) {
         }
     });
     // Activity endpoints
-    app.get("/api/activities", requireAuth, async (req, res) => {
+    app.get("/api/activities", auth_1.requireAuth, async (req, res) => {
         try {
-            const user = getCurrentUser(req);
+            const user = (0, auth_1.getCurrentUser)(req);
             if (!user) {
                 return res.status(401).json({ message: "Not authenticated" });
             }
             const limit = parseInt(req.query.limit) || 10;
-            const activities = await storage.getActivitiesByUserId(user.id, limit);
+            const activities = await storage_1.storage.getActivitiesByUserId(user.id, limit);
             res.json(activities);
         }
         catch (error) {
@@ -314,13 +320,13 @@ export async function registerRoutes(app) {
         }
     });
     // Repository endpoints (GitHub integration)
-    app.get("/api/github/repositories", requireAuth, async (req, res) => {
+    app.get("/api/github/repositories", auth_1.requireAuth, async (req, res) => {
         try {
-            const user = getCurrentUser(req);
+            const user = (0, auth_1.getCurrentUser)(req);
             if (!user || !user.accessToken) {
                 return res.status(401).json({ message: "GitHub access token not found" });
             }
-            const octokit = new Octokit({
+            const octokit = new rest_1.Octokit({
                 auth: user.accessToken,
             });
             const { data: repositories } = await octokit.rest.repos.listForAuthenticatedUser({
@@ -346,13 +352,13 @@ export async function registerRoutes(app) {
         }
     });
     // Stats endpoint
-    app.get("/api/stats", requireAuth, async (req, res) => {
+    app.get("/api/stats", auth_1.requireAuth, async (req, res) => {
         try {
-            const user = getCurrentUser(req);
+            const user = (0, auth_1.getCurrentUser)(req);
             if (!user) {
                 return res.status(401).json({ message: "Not authenticated" });
             }
-            const projects = await storage.getProjectsByUserId(user.id);
+            const projects = await storage_1.storage.getProjectsByUserId(user.id);
             const stats = {
                 totalProjects: projects.length,
                 successfulDeployments: projects.filter(p => p.status === "deployed").length,
@@ -373,7 +379,7 @@ export async function registerRoutes(app) {
                 return res.status(400).json({ message: "deployment_id is required" });
             }
             // Update deployment status
-            const deployment = await storage.updateDeployment(parseInt(deployment_id), {
+            const deployment = await storage_1.storage.updateDeployment(parseInt(deployment_id), {
                 status,
                 buildLogs: logs,
                 deploymentUrl: deployment_url
@@ -382,14 +388,14 @@ export async function registerRoutes(app) {
                 return res.status(404).json({ message: "Deployment not found" });
             }
             // Update project status
-            const project = await storage.getProject(deployment.projectId);
+            const project = await storage_1.storage.getProject(deployment.projectId);
             if (project) {
-                await storage.updateProject(deployment.projectId, {
+                await storage_1.storage.updateProject(deployment.projectId, {
                     status: status === "success" ? "deployed" : status,
                     deploymentUrl: status === "success" ? deployment_url : undefined
                 });
                 // Create activity
-                await storage.createActivity({
+                await storage_1.storage.createActivity({
                     userId: project.userId,
                     projectId: deployment.projectId,
                     type: status === "success" ? "deployment_success" : "deployment_failed",
@@ -411,6 +417,6 @@ export async function registerRoutes(app) {
     app.all("/api/*", (req, res) => {
         res.status(404).json({ message: "API endpoint not found" });
     });
-    const httpServer = createServer(app);
+    const httpServer = (0, http_1.createServer)(app);
     return httpServer;
 }

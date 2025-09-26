@@ -177,10 +177,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "GitHub access token not found" });
       }
 
-      const projectData: InsertProject = insertProjectSchema.parse({
+      const projectData = insertProjectSchema.parse({
         ...req.body,
         userId: user.id
-      });
+      }) as InsertProject;
 
       const project = await storage.createProject(projectData);
       
