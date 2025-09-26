@@ -49,8 +49,7 @@ jobs:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
     env:
-      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # Use project-level token if you have one
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # Replace with project-level token if needed
     
     steps:
       - name: Checkout Code
@@ -72,12 +71,11 @@ jobs:
 
       - name: Deploy Backend to Railway via CLI
         env:
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # Replace with project token if needed
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # Use project-level token if CI/CD fails
         run: |
           npm install -g @railway/cli
           cd ./backend
-          railway up --project $RAILWAY_PROJECT_ID --token $RAILWAY_TOKEN --service=autoflow-backend --environment=production
+          railway up --service=autoflow-backend --environment=production -- --project ${{ secrets.RAILWAY_PROJECT_ID }}
 
   notify-success:
     name: Deployment Success Notification
