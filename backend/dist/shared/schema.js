@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertActivitySchema = exports.insertDeploymentSchema = exports.insertProjectSchema = exports.insertUserSchema = exports.activitiesRelations = exports.deploymentsRelations = exports.projectsRelations = exports.usersRelations = exports.activities = exports.deployments = exports.projects = exports.users = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
-const drizzle_zod_1 = require("drizzle-zod");
+const zod_1 = require("zod");
 const drizzle_orm_1 = require("drizzle-orm");
 exports.users = (0, pg_core_1.pgTable)("users", {
     id: (0, pg_core_1.serial)("id").primaryKey(),
@@ -77,7 +77,39 @@ exports.activitiesRelations = (0, drizzle_orm_1.relations)(exports.activities, (
     }),
 }));
 // Insert schemas
-exports.insertUserSchema = (0, drizzle_zod_1.createInsertSchema)(exports.users);
-exports.insertProjectSchema = (0, drizzle_zod_1.createInsertSchema)(exports.projects);
-exports.insertDeploymentSchema = (0, drizzle_zod_1.createInsertSchema)(exports.deployments);
-exports.insertActivitySchema = (0, drizzle_zod_1.createInsertSchema)(exports.activities);
+exports.insertUserSchema = zod_1.z.object({
+    username: zod_1.z.string(),
+    email: zod_1.z.string(),
+    githubId: zod_1.z.string().optional(),
+    avatar: zod_1.z.string().optional(),
+    accessToken: zod_1.z.string().optional(),
+});
+exports.insertProjectSchema = zod_1.z.object({
+    userId: zod_1.z.number(),
+    name: zod_1.z.string(),
+    description: zod_1.z.string().optional(),
+    repositoryUrl: zod_1.z.string(),
+    repositoryName: zod_1.z.string(),
+    branch: zod_1.z.string().optional(),
+    framework: zod_1.z.string(),
+    deploymentUrl: zod_1.z.string().optional(),
+    status: zod_1.z.string().optional(),
+    lastDeploymentAt: zod_1.z.date().optional(),
+});
+exports.insertDeploymentSchema = zod_1.z.object({
+    projectId: zod_1.z.number(),
+    status: zod_1.z.string().optional(),
+    commitHash: zod_1.z.string().optional(),
+    commitMessage: zod_1.z.string().optional(),
+    buildLogs: zod_1.z.string().optional(),
+    deploymentUrl: zod_1.z.string().optional(),
+    startedAt: zod_1.z.date().optional(),
+    completedAt: zod_1.z.date().optional(),
+});
+exports.insertActivitySchema = zod_1.z.object({
+    userId: zod_1.z.number().optional(),
+    projectId: zod_1.z.number().optional(),
+    type: zod_1.z.string(),
+    description: zod_1.z.string(),
+    metadata: zod_1.z.record(zod_1.z.any()).optional(),
+});

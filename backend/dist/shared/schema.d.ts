@@ -638,14 +638,110 @@ export declare const activitiesRelations: import("drizzle-orm").Relations<"activ
     user: import("drizzle-orm").One<"users", true>;
     project: import("drizzle-orm").One<"projects", false>;
 }>;
-export declare const insertUserSchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
-export declare const insertProjectSchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
-export declare const insertDeploymentSchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
-export declare const insertActivitySchema: import("drizzle-zod").BuildSchema<"insert", Record<string, import("node_modules/drizzle-orm").Column<any, object, object>>, undefined, undefined>;
+export declare const insertUserSchema: z.ZodObject<{
+    username: z.ZodString;
+    email: z.ZodString;
+    githubId: z.ZodOptional<z.ZodString>;
+    avatar: z.ZodOptional<z.ZodString>;
+    accessToken: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    username?: string;
+    email?: string;
+    githubId?: string;
+    avatar?: string;
+    accessToken?: string;
+}, {
+    username?: string;
+    email?: string;
+    githubId?: string;
+    avatar?: string;
+    accessToken?: string;
+}>;
+export declare const insertProjectSchema: z.ZodObject<{
+    userId: z.ZodNumber;
+    name: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    repositoryUrl: z.ZodString;
+    repositoryName: z.ZodString;
+    branch: z.ZodOptional<z.ZodString>;
+    framework: z.ZodString;
+    deploymentUrl: z.ZodOptional<z.ZodString>;
+    status: z.ZodOptional<z.ZodString>;
+    lastDeploymentAt: z.ZodOptional<z.ZodDate>;
+}, "strip", z.ZodTypeAny, {
+    name?: string;
+    userId?: number;
+    description?: string;
+    repositoryUrl?: string;
+    repositoryName?: string;
+    branch?: string;
+    framework?: string;
+    deploymentUrl?: string;
+    status?: string;
+    lastDeploymentAt?: Date;
+}, {
+    name?: string;
+    userId?: number;
+    description?: string;
+    repositoryUrl?: string;
+    repositoryName?: string;
+    branch?: string;
+    framework?: string;
+    deploymentUrl?: string;
+    status?: string;
+    lastDeploymentAt?: Date;
+}>;
+export declare const insertDeploymentSchema: z.ZodObject<{
+    projectId: z.ZodNumber;
+    status: z.ZodOptional<z.ZodString>;
+    commitHash: z.ZodOptional<z.ZodString>;
+    commitMessage: z.ZodOptional<z.ZodString>;
+    buildLogs: z.ZodOptional<z.ZodString>;
+    deploymentUrl: z.ZodOptional<z.ZodString>;
+    startedAt: z.ZodOptional<z.ZodDate>;
+    completedAt: z.ZodOptional<z.ZodDate>;
+}, "strip", z.ZodTypeAny, {
+    deploymentUrl?: string;
+    status?: string;
+    projectId?: number;
+    commitHash?: string;
+    commitMessage?: string;
+    buildLogs?: string;
+    startedAt?: Date;
+    completedAt?: Date;
+}, {
+    deploymentUrl?: string;
+    status?: string;
+    projectId?: number;
+    commitHash?: string;
+    commitMessage?: string;
+    buildLogs?: string;
+    startedAt?: Date;
+    completedAt?: Date;
+}>;
+export declare const insertActivitySchema: z.ZodObject<{
+    userId: z.ZodOptional<z.ZodNumber>;
+    projectId: z.ZodOptional<z.ZodNumber>;
+    type: z.ZodString;
+    description: z.ZodString;
+    metadata: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodAny>>;
+}, "strip", z.ZodTypeAny, {
+    userId?: number;
+    description?: string;
+    projectId?: number;
+    type?: string;
+    metadata?: Record<string, any>;
+}, {
+    userId?: number;
+    description?: string;
+    projectId?: number;
+    type?: string;
+    metadata?: Record<string, any>;
+}>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
-export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type InsertProject = typeof projects.$inferInsert;
 export type Deployment = typeof deployments.$inferSelect;
 export type InsertDeployment = typeof deployments.$inferInsert;
 export type Activity = typeof activities.$inferSelect;
