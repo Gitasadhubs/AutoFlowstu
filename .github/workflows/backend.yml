@@ -27,12 +27,12 @@ jobs:
         run: cd backend && npm ci
 
       - name: Generate migrations
-        run: cd backend && npx drizzle-kit generate
+        run: cd backend && npx drizzle-kit generate --config=drizzle.config.ts
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run migrations
-        run: cd backend && npx drizzle-kit migrate
+        run: cd backend && npx drizzle-kit migrate --config=drizzle.config.ts
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
