@@ -48,6 +48,8 @@ jobs:
   deploy-backend:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     
     steps:
       - name: Checkout Code
@@ -66,16 +68,14 @@ jobs:
       - name: Build Backend
         working-directory: ./backend
         run: npm run build
-      
-      - name: Deploy to Railway
-        uses: railwayapp/cli-action@v2
-        with:
-          railwayToken: ${{ secrets.RAILWAY_TOKEN }}
-          projectId: ${{ secrets.RAILWAY_PROJECT_ID }}
-          environment: production
-          service: autoflow-backend
-          workingDirectory: ./backend
-          
+
+      - name: Deploy Backend to Railway via CLI
+        run: |
+          npm install -g railway
+          railway login --token $RAILWAY_TOKEN
+          cd ./backend
+          railway up --service=autoflow-backend --environment=production
+
   notify-success:
     name: Deployment Success Notification
     runs-on: ubuntu-latest
