@@ -91,5 +91,4 @@ jobs:
       - name: Success Notification
         run: |
           echo "✅ AutoFlow deployed successfully!"
-          echo "Frontend: https://${{ secrets.VERCEL_PROJECT_ID }}.vercel.app"
-          echo "Backend: ${{ secrets.RAILWAY_DATABASE_URL }}"
+          echo "F
