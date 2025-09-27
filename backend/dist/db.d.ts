@@ -1,5 +1,5 @@
 import { Pool } from '@neondatabase/serverless';
-import * as schema from "./src/schema.js";
+import * as schema from "./src/schema";
 export declare const pool: Pool;
 export declare const db: import("drizzle-orm/neon-serverless").NeonDatabase<typeof schema> & {
     $client: Pool;

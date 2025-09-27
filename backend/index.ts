@@ -4,8 +4,8 @@ import passport from "passport";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { registerRoutes } from "./routes.js";
-import "./auth.js"; // Import passport configuration
+import { registerRoutes } from "./routes";
+import "./auth"; // Import passport configuration
 
 const app = express();
 

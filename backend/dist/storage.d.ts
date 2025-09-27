@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Project, type InsertProject, type Deployment, type InsertDeployment, type Activity, type InsertActivity } from "./src/schema.js";
+import { type User, type InsertUser, type Project, type InsertProject, type Deployment, type InsertDeployment, type Activity, type InsertActivity } from "./src/schema";
 export interface IStorage {
     getUser(id: number): Promise<User | undefined>;
     getUserByGithubId(githubId: string): Promise<User | undefined>;

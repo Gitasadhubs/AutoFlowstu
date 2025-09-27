@@ -1,12 +1,18 @@
-import passport from "passport";
-import { Strategy as GitHubStrategy } from "passport-github2";
-import { storage } from "./storage.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getCurrentUser = exports.requireAuth = void 0;
+const passport_1 = __importDefault(require("passport"));
+const passport_github2_1 = require("passport-github2");
+const storage_1 = require("./storage");
 if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
     console.warn("GitHub OAuth credentials not found. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.");
     console.warn("Authentication will be disabled until credentials are provided.");
 }
 else {
-    passport.use(new GitHubStrategy({
+    passport_1.default.use(new passport_github2_1.Strategy({
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
         callbackURL: process.env.NODE_ENV === "production"
@@ -21,12 +27,12 @@ else {
                 avatar: profile.photos?.[0]?.value,
                 accessToken
             };
-            let user = await storage.getUserByGithubId(githubUser.githubId);
+            let user = await storage_1.storage.getUserByGithubId(githubUser.githubId);
             if (!user) {
-                user = await storage.createUser(githubUser);
+                user = await storage_1.storage.createUser(githubUser);
             }
             else {
-                user = await storage.updateUser(user.id, {
+                user = await storage_1.storage.updateUser(user.id, {
                     accessToken: githubUser.accessToken,
                     avatar: githubUser.avatar
                 });
@@ -38,12 +44,12 @@ else {
         }
     }));
 }
-passport.serializeUser((user, done) => {
+passport_1.default.serializeUser((user, done) => {
     done(null, user.id);
 });
-passport.deserializeUser(async (id, done) => {
+passport_1.default.deserializeUser(async (id, done) => {
     try {
-        const user = await storage.getUser(id);
+        const user = await storage_1.storage.getUser(id);
         done(null, user);
     }
     catch (error) {
@@ -51,13 +57,15 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 // Middleware to ensure user is authenticated
-export const requireAuth = (req, res, next) => {
+const requireAuth = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
     }
     res.status(401).json({ message: "Authentication required" });
 };
+exports.requireAuth = requireAuth;
 // Middleware to get current user
-export const getCurrentUser = (req) => {
+const getCurrentUser = (req) => {
     return req.user || null;
 };
+exports.getCurrentUser = getCurrentUser;
