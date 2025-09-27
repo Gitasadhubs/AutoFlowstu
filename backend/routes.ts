@@ -139,11 +139,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     scope: ["user:email", "repo", "workflow"]
   }));
 
-  app.get("/api/auth/github/callback", 
+  app.get("/api/auth/github/callback",
     passport.authenticate("github", { failureRedirect: "/login" }),
     (req, res) => {
-      // Successful authentication, redirect to dashboard
-      res.redirect("/");
+      // Successful authentication, redirect to frontend
+      const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "/" : "http://localhost:3000");
+      res.redirect(frontendUrl);
     }
   );
 
