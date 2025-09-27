@@ -1,5 +1,5 @@
-import { users, projects, deployments, activities } from "./src/schema";
-import { db } from "./db";
+import { users, projects, deployments, activities } from "./src/schema.js";
+import { db } from "./db.js";
 import { eq, desc } from "drizzle-orm";
 export class DatabaseStorage {
     // User methods

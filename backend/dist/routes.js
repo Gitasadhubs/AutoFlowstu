@@ -1,9 +1,9 @@
 import { createServer } from "http";
 import passport from "passport";
 import { Octokit } from "@octokit/rest";
-import { storage } from "./storage";
-import { requireAuth, getCurrentUser } from "./auth";
-import { insertProjectSchema } from "./src/schema";
+import { storage } from "./storage.js";
+import { requireAuth, getCurrentUser } from "./auth.js";
+import { insertProjectSchema } from "./src/schema.js";
 import { z } from "zod";
 // GitHub Actions workflow creation
 async function createGitHubActionsWorkflow(accessToken, project) {

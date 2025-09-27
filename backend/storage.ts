@@ -11,8 +11,8 @@ import {
   type InsertDeployment,
   type Activity,
   type InsertActivity
-} from "./src/schema";
-import { db } from "./db";
+} from "./src/schema.js";
+import { db } from "./db.js";
 import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
