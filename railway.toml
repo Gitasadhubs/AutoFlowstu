@@ -10,4 +10,4 @@ restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 
 [environments.production]
-variables = { NODE_ENV = "production", DATABASE_URL = "${{DATABASE_URL}}", FRONTEND_URL = "${{FRONTEND_URL}}", GITHUB_CLIENT_ID = "${{GITHUB_CLIENT_ID}}", GITHUB_CLIENT_SECRET = "${{GITHUB_CLIENT_SECRET}}", SESSION_SECRET = "${{SESSION_SECRET}}" }
+variables = { NODE_ENV = "production", DATABASE_URL = "${{DATABASE_URL}}", FRONTEND_URL = "${{FRONTEND_URL}}", GITHUB_CLIENT_ID = "${{OAUTH_CLIENT_ID}}", GITHUB_CLIENT_SECRET = "${{OAUTH_CLIENT_SECRET}}", SESSION_SECRET = "${{SESSION_SECRET}}" }
