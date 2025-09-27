@@ -31,7 +31,7 @@ jobs:
       - name: Build Frontend
         working-directory: ./frontend
         env:
-          VITE_API_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+          VITE_API_URL: ${{ secrets.BACKEND_API_URL }}   # ✅ use backend API, not DB URL
           VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
           NODE_ENV: production
         run: npm run build
@@ -50,7 +50,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
-      RAILWAY_PROJECT: ${{ secrets.RAILWAY_PROJECT_ID }}
       DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
 
     steps:
@@ -71,21 +70,12 @@ jobs:
         working-directory: ./backend
         run: npm run build
 
-      - name: Ensure Drizzle Journal Exists
-        working-directory: ./backend
-        run: |
-          mkdir -p meta
-          if [ ! -f meta/_journal.json ]; then
-            echo "[]" > meta/_journal.json
-          fi
-
-      - name: Run Drizzle Migrations
-        working-directory: ./backend
-        run: npx drizzle-kit migrate
+      # ❌ Skipped Drizzle migration steps
 
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
           cd ./backend
           railway up --service=backend --environment=production
 
@@ -100,4 +90,4 @@ jobs:
         run: |
           echo "✅ AutoFlow deployed successfully!"
           echo "Frontend: https://${{ secrets.VERCEL_PROJECT_ID }}.vercel.app"
-          echo "Backend: ${{ secrets.RAILWAY_DATABASE_URL }}"
+          echo "Backend deployed to Railway project: ${{ secrets.RAILWAY_PROJECT_ID }}"
