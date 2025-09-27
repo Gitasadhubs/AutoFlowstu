@@ -1,2 +1,4 @@
 node_modules
-im mak
+.env
+dist
+*.log
