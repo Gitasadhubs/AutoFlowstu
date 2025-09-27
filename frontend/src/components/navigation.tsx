@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import type { User } from "@shared/schema";
 
 export default function Navigation() {
@@ -22,15 +23,15 @@ export default function Navigation() {
           
           <div className="hidden md:block animate-fade-in-up stagger-2">
             <div className="ml-10 flex items-baseline space-x-4">
-              <a href="#" className="text-white px-4 py-2 rounded-lg text-sm font-medium btn-modern gradient-primary hover-lift">
+              <Link href="/" className="text-white px-4 py-2 rounded-lg text-sm font-medium btn-modern gradient-primary hover-lift">
                 Dashboard
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium interactive">
+              </Link>
+              <Link href="/docs" className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium interactive">
                 Documentation
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium interactive">
+              </Link>
+              <Link href="/support" className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium interactive">
                 Support
-              </a>
+              </Link>
             </div>
           </div>
           
