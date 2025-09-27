@@ -1,5 +1,5 @@
 import { pgTable, text, serial, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 import { relations } from "drizzle-orm";
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
@@ -74,7 +74,39 @@ export const activitiesRelations = relations(activities, ({ one }) => ({
     }),
 }));
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit(['id', 'createdAt']);
-export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
-export const insertDeploymentSchema = createInsertSchema(deployments).omit({ id: true, startedAt: true });
-export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, createdAt: true });
+export const insertUserSchema = z.object({
+    username: z.string(),
+    email: z.string(),
+    githubId: z.string().optional(),
+    avatar: z.string().optional(),
+    accessToken: z.string().optional(),
+});
+export const insertProjectSchema = z.object({
+    userId: z.number(),
+    name: z.string(),
+    description: z.string().optional(),
+    repositoryUrl: z.string(),
+    repositoryName: z.string(),
+    branch: z.string().optional(),
+    framework: z.string(),
+    deploymentUrl: z.string().optional(),
+    status: z.string().optional(),
+    lastDeploymentAt: z.date().optional(),
+});
+export const insertDeploymentSchema = z.object({
+    projectId: z.number(),
+    status: z.string().optional(),
+    commitHash: z.string().optional(),
+    commitMessage: z.string().optional(),
+    buildLogs: z.string().optional(),
+    deploymentUrl: z.string().optional(),
+    startedAt: z.date().optional(),
+    completedAt: z.date().optional(),
+});
+export const insertActivitySchema = z.object({
+    userId: z.number().optional(),
+    projectId: z.number().optional(),
+    type: z.string(),
+    description: z.string(),
+    metadata: z.record(z.any()).optional(),
+});

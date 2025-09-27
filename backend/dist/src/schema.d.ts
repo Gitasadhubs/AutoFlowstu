@@ -669,26 +669,26 @@ export declare const insertProjectSchema: z.ZodObject<{
     status: z.ZodOptional<z.ZodString>;
     lastDeploymentAt: z.ZodOptional<z.ZodDate>;
 }, "strip", z.ZodTypeAny, {
+    branch?: string;
     name?: string;
-    userId?: number;
     description?: string;
+    status?: string;
+    userId?: number;
     repositoryUrl?: string;
     repositoryName?: string;
-    branch?: string;
     framework?: string;
     deploymentUrl?: string;
-    status?: string;
     lastDeploymentAt?: Date;
 }, {
+    branch?: string;
     name?: string;
-    userId?: number;
     description?: string;
+    status?: string;
+    userId?: number;
     repositoryUrl?: string;
     repositoryName?: string;
-    branch?: string;
     framework?: string;
     deploymentUrl?: string;
-    status?: string;
     lastDeploymentAt?: Date;
 }>;
 export declare const insertDeploymentSchema: z.ZodObject<{
@@ -701,8 +701,8 @@ export declare const insertDeploymentSchema: z.ZodObject<{
     startedAt: z.ZodOptional<z.ZodDate>;
     completedAt: z.ZodOptional<z.ZodDate>;
 }, "strip", z.ZodTypeAny, {
-    deploymentUrl?: string;
     status?: string;
+    deploymentUrl?: string;
     projectId?: number;
     commitHash?: string;
     commitMessage?: string;
@@ -710,8 +710,8 @@ export declare const insertDeploymentSchema: z.ZodObject<{
     startedAt?: Date;
     completedAt?: Date;
 }, {
-    deploymentUrl?: string;
     status?: string;
+    deploymentUrl?: string;
     projectId?: number;
     commitHash?: string;
     commitMessage?: string;
@@ -726,16 +726,16 @@ export declare const insertActivitySchema: z.ZodObject<{
     description: z.ZodString;
     metadata: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodAny>>;
 }, "strip", z.ZodTypeAny, {
-    userId?: number;
-    description?: string;
-    projectId?: number;
     type?: string;
+    description?: string;
+    userId?: number;
+    projectId?: number;
     metadata?: Record<string, any>;
 }, {
-    userId?: number;
-    description?: string;
-    projectId?: number;
     type?: string;
+    description?: string;
+    userId?: number;
+    projectId?: number;
     metadata?: Record<string, any>;
 }>;
 export type User = typeof users.$inferSelect;
