@@ -1,30 +1,92 @@
-deploy-backend:
-  name: Deploy Backend to Railway
-  runs-on: ubuntu-latest
-  env:
-    RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
-    DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+name: Deploy AutoFlow to Vercel & Railway
 
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+env:
+  NODE_VERSION: '18'
 
-    - name: Install Backend Dependencies
-      working-directory: ./backend
-      run: npm ci
+jobs:
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    runs-on: ubuntu-latest
 
-    - name: Build Backend
-      working-directory: ./backend
-      run: npm run build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Deploy Backend to Railway via CLI
-      run: |
-        npm install -g @railway/cli
-        cd ./backend
-        railway up --service=backend --environment=production
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: ${{ secrets.BACKEND_API_URL }}   # ✅ backend API URL, not DB URL
+          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--prod'
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./frontend
+
+  deploy-backend:
+    name: Deploy Backend to Railway
+    runs-on: ubuntu-latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}   # ✅ must be project-scoped token
+      DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
+
+      # ❌ Skipped Drizzle migration steps
+
+      - name: Deploy Backend to Railway via CLI
+        run: |
+          npm install -g @railway/cli
+          cd ./backend
+          railway up --service=backend --environment=production
+
+  notify-success:
+    name: Deployment Success Notification
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, deploy-backend]
+    if: success()
+
+    steps:
+      - name: Success Notification
+        run: |
+          echo "✅ AutoFlow deployed successfully!"
+          echo "Frontend: https://${{ secrets.VERCEL_PROJECT_ID }}.vercel.app"
+          echo "Backend: deployed on Railway (check project ${{ secrets.RAILWAY_PROJECT_ID }})"
