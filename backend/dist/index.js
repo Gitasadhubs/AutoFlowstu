@@ -86,6 +86,10 @@ app.use((req, res, next) => {
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+// Root endpoint
+app.get("/", (req, res) => {
+    res.send("Backend is running 🚀");
+});
 (async () => {
     const server = await (0, routes_1.registerRoutes)(app);
     app.use((err, _req, res, _next) => {

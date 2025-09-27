@@ -135,8 +135,9 @@ async function registerRoutes(app) {
         scope: ["user:email", "repo", "workflow"]
     }));
     app.get("/api/auth/github/callback", passport_1.default.authenticate("github", { failureRedirect: "/login" }), (req, res) => {
-        // Successful authentication, redirect to dashboard
-        res.redirect("/");
+        // Successful authentication, redirect to frontend
+        const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === "production" ? "/" : "http://localhost:3000");
+        res.redirect(frontendUrl);
     });
     app.post("/api/auth/logout", (req, res) => {
         req.logout((err) => {

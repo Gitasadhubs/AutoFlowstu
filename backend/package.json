@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
+    "build:backend": "tsc",
     "dev": "tsx watch index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
