@@ -4,6 +4,7 @@ import path from "path";
 
 // Vercel-optimized Vite configuration for frontend deployment
 export default defineConfig({
+  base: "/",
   plugins: [react()],
   
   resolve: {
