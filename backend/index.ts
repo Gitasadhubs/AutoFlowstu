@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
@@ -6,6 +7,8 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
+import { migrate } from "drizzle-orm/neon-serverless/migrator";
+import { db } from "./db";
 import "./auth"; // Import passport configuration
 
 const app = express();
@@ -121,6 +124,11 @@ app.get("/", (req, res) => {
     console.log('GitHub client set:', !!process.env.GITHUB_CLIENT_ID);
     console.log('Backend URL:', process.env.BACKEND_URL);
     console.log('Frontend URL:', process.env.FRONTEND_URL);
+    
+    // Run database migrations automatically in production
+    console.log('📊 Running database migrations...');
+    await migrate(db, { migrationsFolder: './drizzle' });
+    console.log('✅ Database migrations completed');
     
     const server = await registerRoutes(app);
     console.log('✅ Routes registered successfully');
