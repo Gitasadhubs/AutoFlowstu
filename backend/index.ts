@@ -126,9 +126,14 @@ app.get("/", (req, res) => {
     console.log('Frontend URL:', process.env.FRONTEND_URL);
     
     // Run database migrations automatically in production
-    console.log('📊 Running database migrations...');
-    await migrate(db, { migrationsFolder: './drizzle' });
-    console.log('✅ Database migrations completed');
+    try {
+      console.log('📊 Running database migrations...');
+      await migrate(db, { migrationsFolder: './drizzle' });
+      console.log('✅ Database migrations completed');
+    } catch (migrationError) {
+      console.error('⚠️  Migration failed, but continuing:', migrationError.message);
+      // Don't fail the entire startup if migrations fail
+    }
     
     const server = await registerRoutes(app);
     console.log('✅ Routes registered successfully');
