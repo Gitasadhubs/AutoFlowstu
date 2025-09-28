@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node simple-start.cjs",
+    "start": "tsx index.ts",
     "start:complex": "tsx index.ts",
     "start:build": "node dist/index.js", 
     "build": "tsc",
