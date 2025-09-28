@@ -52,6 +52,10 @@ async function triggerGitHubActionsWorkflow(accessToken: string, project: Projec
   
   const [owner, repo] = project.repositoryName.split('/');
   
+  // Normalize BACKEND_URL for webhook target
+  const normalizeUrl = (u?: string) => (u || "").trim().replace(/^['"]|['"]$/g, "").replace(/\/+$/, "");
+  const backendBase = normalizeUrl(process.env.BACKEND_URL) || "http://localhost:5000";
+
   await octokit.rest.actions.createWorkflowDispatch({
     owner,
     repo,
@@ -59,9 +63,7 @@ async function triggerGitHubActionsWorkflow(accessToken: string, project: Projec
     ref: project.branch,
     inputs: {
       deployment_id: deploymentId.toString(),
-      webhook_url: process.env.NODE_ENV === "production" 
-        ? `${process.env.BACKEND_URL}/api/webhooks/github`
-        : `http://localhost:5000/api/webhooks/github`
+      webhook_url: `${backendBase}/api/webhooks/github`
     }
   });
 }

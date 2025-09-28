@@ -7,12 +7,16 @@ if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
   console.warn("GitHub OAuth credentials not found. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.");
   console.warn("Authentication will be disabled until credentials are provided.");
 } else {
+  // Normalize BACKEND_URL (strip wrapping quotes and trailing slashes) and build callback
+  const normalizeUrl = (u?: string) => (u || "").trim().replace(/^['"]|['"]$/g, "").replace(/\/+$/, "");
+  const backendBase = normalizeUrl(process.env.BACKEND_URL);
+  const devBase = "http://localhost:5000";
+  const callbackBase = backendBase || (process.env.NODE_ENV === "production" ? devBase : devBase);
+
   passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.NODE_ENV === "production" 
-      ? `${process.env.BACKEND_URL}/api/auth/github/callback`
-      : "http://localhost:5000/api/auth/github/callback"
+    callbackURL: `${callbackBase}/api/auth/github/callback`
   }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
     try {
       const githubUser = {

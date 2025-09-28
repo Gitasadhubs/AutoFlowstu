@@ -1,0 +1,14 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacksConfig]
+nixpkgs = "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+
+[variables]
+NODE_VERSION = "20.11.0"

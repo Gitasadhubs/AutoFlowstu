@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const express_session_1 = __importDefault(require("express-session"));
+const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
 const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -20,10 +20,12 @@ app.use((0, helmet_1.default)({
     contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
 }));
 // CORS configuration - allow frontend domain
+// Ensure we normalize FRONTEND_URL to an origin (strip trailing slashes/paths)
+const frontendOrigin = process.env.FRONTEND_URL ? new URL(process.env.FRONTEND_URL).origin : undefined;
 app.use((0, cors_1.default)({
     origin: process.env.NODE_ENV === "production"
         ? [
-            process.env.FRONTEND_URL || "https://autoflow-frontend.vercel.app",
+            frontendOrigin || "https://autoflow-frontend.vercel.app",
             /\.vercel\.app$/,
             /\.railway\.app$/
         ]
@@ -43,14 +45,22 @@ app.use("/api", limiter);
 // Body parsing middleware
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
-// Session configuration
+// Session configuration (production-ready: Postgres-backed store and cross-site cookie settings)
+const PgSession = (0, connect_pg_simple_1.default)(express_session_1.default);
 app.use((0, express_session_1.default)({
+    store: new PgSession({
+        conString: process.env.DATABASE_URL,
+        createTableIfMissing: true,
+        tableName: "session",
+    }),
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
+        // Allow cross-site requests from your frontend domain (Vercel -> Railway)
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
 }));
