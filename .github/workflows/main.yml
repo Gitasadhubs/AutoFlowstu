@@ -1,13 +1,14 @@
 name: Deploy AutoFlow to Vercel & Railway
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  # push:
+  #   branches: [ main, master ]
+  # pull_request:
+  #   branches: [ main, master ]
+  workflow_dispatch: # Only run manually for now
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
 
 jobs:
   deploy-frontend:
@@ -31,8 +32,8 @@ jobs:
       - name: Build Frontend
         working-directory: ./frontend
         env:
-          VITE_API_URL: ${{ secrets.BACKEND_API_URL }}   # ✅ backend API URL, not DB URL
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          VITE_API_URL: https://brave-learning-production.up.railway.app
+          VITE_GITHUB_CLIENT_ID: Ov23liD0vCPKy0moMGPI
           NODE_ENV: production
         run: npm run build
 
@@ -49,8 +50,7 @@ jobs:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
     env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}   # ✅ must be project-scoped token
-      DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
     steps:
       - name: Checkout Code
@@ -66,17 +66,13 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: Build Backend
-        working-directory: ./backend
-        run: npm run build
-
-      # ❌ Skipped Drizzle migration steps
-
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
           cd ./backend
-          railway up --service=backend --environment=production
+          railway up --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   notify-success:
     name: Deployment Success Notification
