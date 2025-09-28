@@ -1,28 +1,23 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const express_session_1 = __importDefault(require("express-session"));
-const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
-const passport_1 = __importDefault(require("passport"));
-const cors_1 = __importDefault(require("cors"));
-const helmet_1 = __importDefault(require("helmet"));
-const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const routes_1 = require("./routes");
-require("./auth"); // Import passport configuration
-const app = (0, express_1.default)();
+import express from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import passport from "passport";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { registerRoutes } from "./routes";
+import "./auth"; // Import passport configuration
+const app = express();
 // Trust proxy for Railway
 app.set('trust proxy', 1);
 // Security middleware
-app.use((0, helmet_1.default)({
+app.use(helmet({
     contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
 }));
 // CORS configuration - allow frontend domain
 // Ensure we normalize FRONTEND_URL to an origin (strip trailing slashes/paths)
 const frontendOrigin = process.env.FRONTEND_URL ? new URL(process.env.FRONTEND_URL).origin : undefined;
-app.use((0, cors_1.default)({
+app.use(cors({
     origin: process.env.NODE_ENV === "production"
         ? [
             frontendOrigin || "https://autoflow-frontend.vercel.app",
@@ -33,7 +28,7 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 // Rate limiting - Configure trust proxy properly for security
-const limiter = (0, express_rate_limit_1.default)({
+const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
     skip: (req) => process.env.NODE_ENV === "development",
@@ -43,11 +38,11 @@ const limiter = (0, express_rate_limit_1.default)({
 });
 app.use("/api", limiter);
 // Body parsing middleware
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 // Session configuration (production-ready: Postgres-backed store and cross-site cookie settings)
-const PgSession = (0, connect_pg_simple_1.default)(express_session_1.default);
-app.use((0, express_session_1.default)({
+const PgSession = connectPgSimple(session);
+app.use(session({
     store: new PgSession({
         conString: process.env.DATABASE_URL,
         createTableIfMissing: true,
@@ -65,8 +60,8 @@ app.use((0, express_session_1.default)({
     },
 }));
 // Passport middleware
-app.use(passport_1.default.initialize());
-app.use(passport_1.default.session());
+app.use(passport.initialize());
+app.use(passport.session());
 // Request logging middleware
 app.use((req, res, next) => {
     const start = Date.now();
@@ -101,7 +96,7 @@ app.get("/", (req, res) => {
     res.send("Backend is running 🚀");
 });
 (async () => {
-    const server = await (0, routes_1.registerRoutes)(app);
+    const server = await registerRoutes(app);
     app.use((err, _req, res, _next) => {
         const status = err.status || err.statusCode || 500;
         const message = err.message || "Internal Server Error";
