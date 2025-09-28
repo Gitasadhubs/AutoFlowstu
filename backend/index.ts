@@ -113,19 +113,34 @@ app.get("/", (req, res) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    console.log('🚀 Starting AutoFlow backend...');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Database URL set:', !!process.env.DATABASE_URL);
+    console.log('Session secret set:', !!process.env.SESSION_SECRET);
+    console.log('GitHub client set:', !!process.env.GITHUB_CLIENT_ID);
+    console.log('Backend URL:', process.env.BACKEND_URL);
+    console.log('Frontend URL:', process.env.FRONTEND_URL);
+    
+    const server = await registerRoutes(app);
+    console.log('✅ Routes registered successfully');
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    console.error(err);
-  });
+      res.status(status).json({ message });
+      console.error('❌ Server error:', err);
+    });
 
-  // Use Railway's PORT environment variable or default to 3000
-  const port = parseInt(process.env.PORT || "3000", 10);
-  server.listen(port, "0.0.0.0", () => {
-    console.log(`Backend server running on port ${port}`);
-  });
+    // Use Railway's PORT environment variable or default to 3000
+    const port = parseInt(process.env.PORT || "3000", 10);
+    server.listen(port, "0.0.0.0", () => {
+      console.log(`✅ Backend server running on port ${port}`);
+      console.log(`🔗 Health check: http://0.0.0.0:${port}/api/health`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
 })();

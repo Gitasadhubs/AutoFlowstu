@@ -4,7 +4,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "tsx index.ts",
+    "start:build": "node dist/index.js", 
     "build": "tsc",
     "build:backend": "tsc",
     "dev": "tsx watch index.ts",
@@ -29,6 +30,7 @@
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
     "pg": "^8.11.0",
+    "tsx": "^4.19.2",
     "ws": "^8.18.0",
     "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0"
@@ -43,7 +45,6 @@
     "@types/passport-local": "^1.0.38",
     "@types/ws": "^8.5.13",
     "drizzle-kit": "^0.27.2",
-    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vite": "^5.4.20"
   },
