@@ -1,6 +1,6 @@
-import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import passport from "passport";
 import cors from "cors";
 import helmet from "helmet";
@@ -19,10 +19,12 @@ app.use(helmet({
 }));
 
 // CORS configuration - allow frontend domain
+// Ensure we normalize FRONTEND_URL to an origin (strip trailing slashes/paths)
+const frontendOrigin = process.env.FRONTEND_URL ? new URL(process.env.FRONTEND_URL).origin : undefined;
 app.use(cors({
   origin: process.env.NODE_ENV === "production" 
     ? [
-        process.env.FRONTEND_URL || "https://autoflow-frontend.vercel.app",
+        frontendOrigin || "https://autoflow-frontend.vercel.app",
         /\.vercel\.app$/,
         /\.railway\.app$/
       ]
@@ -45,14 +47,22 @@ app.use("/api", limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Session configuration
+// Session configuration (production-ready: Postgres-backed store and cross-site cookie settings)
+const PgSession = connectPgSimple(session);
 app.use(session({
+  store: new PgSession({
+    conString: process.env.DATABASE_URL as string,
+    createTableIfMissing: true,
+    tableName: "session",
+  }),
   secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
+    // Allow cross-site requests from your frontend domain (Vercel -> Railway)
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   },
 }));
