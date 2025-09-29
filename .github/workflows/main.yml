@@ -31,8 +31,8 @@ jobs:
       - name: Build Frontend
         working-directory: ./frontend
         env:
-          VITE_API_URL: ${{ secrets.BACKEND_API_URL }}   # ✅ backend API URL, not DB URL
-          VITE_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          VITE_API_URL: ${{ secrets.BACKEND_URL }}
+          VITE_GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
           NODE_ENV: production
         run: npm run build
 
@@ -49,8 +49,7 @@ jobs:
     name: Deploy Backend to Railway
     runs-on: ubuntu-latest
     env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}   # ✅ must be project-scoped token
-      DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
 
     steps:
       - name: Checkout Code
@@ -70,13 +69,24 @@ jobs:
         working-directory: ./backend
         run: npm run build
 
-      # ❌ Skipped Drizzle migration steps
-
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set NODE_ENV=production
+          railway variables set BACKEND_URL=https://brave-learning-production.up.railway.app
+          railway variables set FRONTEND_URL=https://project-z9rm9.vercel.app
+          railway variables set DATABASE_URL=postgresql://postgres:zTuLTayaRqmulHkRrKvnIVzXOhnoKDXj@postgres.railway.internal:5432/railway
+          railway variables set SESSION_SECRET=TrJHICTh0LhHU-pWG0qaBKLIOLbBw3LCe3bEGMaCpks
+          railway variables set GITHUB_CLIENT_ID=Ov23liD0vCPKy0moMGPI
+          railway variables set GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}
+          railway variables set GITHUB_CALLBACK_URL=https://brave-learning-production.up.railway.app/api/auth/github/callback
+          railway variables set OAUTH_CLIENT_SECRET=0764dd5a7e66adbadd87ad548e3ebc5eb706550c
           cd ./backend
-          railway up --service=backend --environment=production
+          railway up --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+
   notify-success:
     name: Deployment Success Notification
     runs-on: ubuntu-latest
