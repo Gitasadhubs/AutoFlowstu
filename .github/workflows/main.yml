@@ -69,6 +69,7 @@ jobs:
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
           cd ./backend
           railway up --detach
         env:
