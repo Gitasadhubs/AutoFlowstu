@@ -69,12 +69,6 @@ jobs:
         working-directory: ./backend
         run: npm run build
 
-      - name: Run Database Migration
-        working-directory: ./backend
-        run: npm run db:migrate
-        env:
-          DATABASE_URL: postgresql://postgres:zTuLTayaRqmulHkRrKvnIVzXOhnoKDXj@postgres.railway.internal:5432/railway
-
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
