@@ -72,18 +72,17 @@ jobs:
       - name: Deploy Backend to Railway via CLI
         run: |
           npm install -g @railway/cli
-          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
-          railway variables set NODE_ENV=production
-          railway variables set BACKEND_URL=https://brave-learning-production.up.railway.app
-          railway variables set FRONTEND_URL=https://project-z9rm9.vercel.app
-          railway variables set DATABASE_URL=postgresql://postgres:zTuLTayaRqmulHkRrKvnIVzXOhnoKDXj@postgres.railway.internal:5432/railway
-          railway variables set SESSION_SECRET=TrJHICTh0LhHU-pWG0qaBKLIOLbBw3LCe3bEGMaCpks
-          railway variables set GITHUB_CLIENT_ID=Ov23liD0vCPKy0moMGPI
-          railway variables set GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}
-          railway variables set GITHUB_CALLBACK_URL=https://brave-learning-production.up.railway.app/api/auth/github/callback
-          railway variables set OAUTH_CLIENT_SECRET=0764dd5a7e66adbadd87ad548e3ebc5eb706550c
+          railway variables set NODE_ENV=production --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set BACKEND_URL=https://brave-learning-production.up.railway.app --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set FRONTEND_URL=https://project-z9rm9.vercel.app --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set DATABASE_URL=postgresql://postgres:zTuLTayaRqmulHkRrKvnIVzXOhnoKDXj@postgres.railway.internal:5432/railway --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set SESSION_SECRET=TrJHICTh0LhHU-pWG0qaBKLIOLbBw3LCe3bEGMaCpks --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set GITHUB_CLIENT_ID=Ov23liD0vCPKy0moMGPI --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }} --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set GITHUB_CALLBACK_URL=https://brave-learning-production.up.railway.app/api/auth/github/callback --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway variables set OAUTH_CLIENT_SECRET=0764dd5a7e66adbadd87ad548e3ebc5eb706550c --project-id ${{ secrets.RAILWAY_PROJECT_ID }}
           cd ./backend
-          railway up --detach
+          railway up --project-id ${{ secrets.RAILWAY_PROJECT_ID }} --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
 
